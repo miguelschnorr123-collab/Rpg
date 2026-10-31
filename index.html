@@ -284,7 +284,7 @@ body.lowhp #fxl .low{animation:lubdub 1.1s ease-in-out infinite}
 .mwsel{stroke:var(--acc);stroke-width:max(9px,calc(7px*var(--iz,1)));stroke-linecap:round;opacity:.6}
 .mwh{fill:var(--acc);stroke:transparent;stroke-width:max(24px,calc(20px*var(--iz,1)));r:max(5px,calc(5px*var(--iz,1)));pointer-events:all;cursor:grab}
 .mdhit{cursor:pointer}
-.mwpa{stroke:#c9a0ff}.mwpl{stroke:#3a2060;stroke-dasharray:2 6;stroke-linecap:round}
+
 .mwno{stroke:#8fd3ee}.mwnl{stroke:#1b4a5e;stroke-dasharray:7 5;stroke-linecap:butt}
 .mrfw{stroke:#2e1b0a;stroke-width:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.55))}.mbk{stroke:#eaf8ff;stroke-width:3;stroke-dasharray:1 7;stroke-linecap:round;fill:none}
 .inv{position:relative;display:grid;border:1px solid #888;background:#0002;margin:6px 0;touch-action:manipulation}.inv .ic{border:1px solid #8883;box-sizing:border-box}.inv .ii{position:absolute;box-sizing:border-box;border:2px solid #0007;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 12px/1 system-ui,sans-serif;font-style:normal;color:#fff;cursor:pointer;text-shadow:0 1px 2px #000}.inv .ii.t{background:repeating-linear-gradient(#b07a3d 0 7px,#7d4f24 7px 8px)}.inv .ii.p{background:#6b7480}.inv .ii.sel{outline:3px solid #ffd34d;z-index:2}
@@ -408,7 +408,7 @@ main{padding:.7rem .7rem 2rem}
 .popc{width:96%;max-height:86vh}
 /* Tabletop: opções do mestre ficam recolhidas atrás do botão "Opções" para sobrar tela para o mapa */
 .mbar:not(.open)>.mrow:not(:first-child):not(.mzoom),.mbar:not(.open)>details.mhelp{display:none}
-.mbar:not(.open) [data-act="mmenu"],.mbar:not(.open) [data-act="mhmenu"],.mbar:not(.open) [data-act="mgrid"],.mbar:not(.open) [data-act="mwadd"],.mbar:not(.open) [data-act="mdadd"],.mbar:not(.open) [data-act="mwinadd"],.mbar:not(.open) [data-act="mpasadd"],.mbar:not(.open) [data-act="mimgpick"],.mbar:not(.open) [data-act="mimgdel"]{display:none}
+.mbar:not(.open) [data-act="mmenu"],.mbar:not(.open) [data-act="mhmenu"],.mbar:not(.open) [data-act="mgrid"],.mbar:not(.open) [data-act="mwadd"],.mbar:not(.open) [data-act="mdadd"],.mbar:not(.open) [data-act="mwinadd"],.mbar:not(.open) [data-act="mimgpick"],.mbar:not(.open) [data-act="mimgdel"]{display:none}
 body.mesa-full .mbar>.mrow:first-child{padding-right:112px}
 /* botão que acompanha a tela + analógicos */
 #mhud{position:fixed;inset:0;pointer-events:none;z-index:75}#mhud[hidden]{display:none}
@@ -952,7 +952,7 @@ function pFig() { return S.tab === 'ficha' ? (altFig(altSel()) || S.fs.find(x =>
 const LITEKEY = 'pzrpg-lite';
 let LITE = true;
 try { if (localStorage.getItem(LITEKEY) === '0') LITE = false; } catch (e) { }
-const mWl = () => S.mesa.walls || (S.mesa.walls = []);
+const mWl = () => { const a = S.mesa.walls || (S.mesa.walls = []); if (a.some(w => w.pas)) S.mesa.walls = a.filter(w => !w.pas); return S.mesa.walls; };   // passagens (removidas) somem dos mapas antigos
 /* desfazer (só ações do mapa; não é salvo) */
 function mSnapStr() { return JSON.stringify({ tk: S.mesa.tk, walls: S.mesa.walls || [], wn: S.mesa.wn || 0, st: S.mesa.st, sn: S.mesa.sn, im: S.mesa.im || null }); }
 function mPush(str) {
@@ -984,7 +984,7 @@ const MWOOD = '<pattern id="mwood" width="40" height="10" patternUnits="userSpac
   + '</pattern>';
 function mWalls() {
   const lk = !!S.mesa.wlock; let h = '';
-  mWl().forEach(w => { const hit = ME.mestre ? `<line class="mwhit" data-wid="${w.id}" x1="${w.x1 * MS}" y1="${w.y1 * MS}" x2="${w.x2 * MS}" y2="${w.y2 * MS}"/>` : '', a = `data-wid="${w.id}" x1="${w.x1 * MS}" y1="${w.y1 * MS}" x2="${w.x2 * MS}" y2="${w.y2 * MS}"`; if (w.win && (lk || !ME.mestre)) h += `<line class="mwhit mdhit" ${a}/>`; if (w.door) h += `<g class="mdg" data-dg="${w.id}">${mDoorG(w)}</g><line class="mwhit mdhit" ${a}/>`; else if (!lk) h += w.pas ? `<line class="mwo mwpa" ${a}/><line class="mwl mwpl" ${a}/>${hit}` : w.win ? `<line class="mwo mwno" ${a}/><line class="mwl mwnl" ${a}/>${hit}` : `<line class="mwo" ${a}/><line class="mwl" ${a}/>${hit}`; });
+  mWl().forEach(w => { const hit = ME.mestre ? `<line class="mwhit" data-wid="${w.id}" x1="${w.x1 * MS}" y1="${w.y1 * MS}" x2="${w.x2 * MS}" y2="${w.y2 * MS}"/>` : '', a = `data-wid="${w.id}" x1="${w.x1 * MS}" y1="${w.y1 * MS}" x2="${w.x2 * MS}" y2="${w.y2 * MS}"`; if (w.win && (lk || !ME.mestre)) h += `<line class="mwhit mdhit" ${a}/>`; if (w.door) h += `<g class="mdg" data-dg="${w.id}">${mDoorG(w)}</g><line class="mwhit mdhit" ${a}/>`; else if (!lk) h += w.win ? `<line class="mwo mwno" ${a}/><line class="mwl mwnl" ${a}/>${hit}` : `<line class="mwo" ${a}/><line class="mwl" ${a}/>${hit}`; });
   mWl().forEach(w => { const b = `x1="${w.x1 * MS}" y1="${w.y1 * MS}" x2="${w.x2 * MS}" y2="${w.y2 * MS}"`; if (w.rf) { const dx = (w.x2 - w.x1) * MS, dy = (w.y2 - w.y1) * MS, L = Math.hypot(dx, dy), th = w.door ? 11 : 9; h += `<g transform="translate(${w.x1 * MS} ${w.y1 * MS}) rotate(${Math.atan2(dy, dx) * 180 / Math.PI})"><rect class="mrfw" x="0" y="${-th / 2}" width="${L}" height="${th}" rx="1.5" fill="url(#mwood)"/></g>`; } else if (w.win && w.br === 1) h += `<line class="mbk" ${b}/>`; });
   return `<svg class="mwalls" width="${MC * MS}" height="${MR * MS}" aria-hidden="true"><defs>${MWOOD}</defs>${h}</svg>`;
 }
@@ -1311,7 +1311,6 @@ function panelRef() {
 function mWallAct() {
   const w = mWl().find(x => x.id === S.mesa.wsel), ed = !S.mesa.wlock && ME.mestre; if (!w || (!ed && !w.win)) return '';
   const x = (w.x1 + w.x2) / 2 * MS, y = Math.max(2, Math.min(w.y1, w.y2) * MS - 44);
-  if (w.pas) return `<div class="mact" style="left:${x}px;top:${y}px"><button data-act="mwdel" data-id="${w.id}" title="Apagar passagem">✕ Passagem</button></div>`;
   if (w.win) return `<div class="mact" style="left:${x}px;top:${y}px">${w.rf ? `<button data-act="mlook" data-id="${w.id}">Olhar</button><button data-act="mrfx" data-id="${w.id}">Remover reforço</button>` : `${w.br ? '' : `<button data-act="mbreak" data-id="${w.id}">Quebrar</button>`}${w.br === 1 ? `<button data-act="mclean" data-id="${w.id}">Remover cacos</button>` : ''}${w.br ? `<button data-act="mjump" data-id="${w.id}">Pular</button>` : ''}<button data-act="mrf" data-id="${w.id}">Reforçar</button>`}${ed ? `<button data-act="mwdel" data-id="${w.id}" title="Apagar janela">✕ Janela</button>` : ''}</div>`;
   if (w.door) return `<div class="mact" style="left:${x}px;top:${y}px">${w.rf ? `<button data-act="mrfx" data-id="${w.id}">Remover reforço</button>` : `<button class="go" data-act="mdtog" data-id="${w.id}">${w.open ? 'Fechar' : 'Abrir'} porta</button><button data-act="mrf" data-id="${w.id}">Reforçar</button>`}<button data-act="mwdel" data-id="${w.id}" title="Apagar porta">✕ Porta</button></div>`;
   return `<div class="mact" style="left:${x}px;top:${y}px"><button data-act="mwdel" data-id="${w.id}" title="Apagar parede">✕ Parede</button></div>`;
@@ -1460,51 +1459,6 @@ function mHalo(x, o, R, rgb, a0) {   // círculo ao redor do boneco: fraco no ce
   for (let i = 1; i <= 12; i++) { const u = i / 12, k = 1 - u * u * (3 - 2 * u); g.addColorStop(.12 + .88 * u, `rgba(${rgb},${(a0 * k).toFixed(3)})`); }
   x.fillStyle = g; x.fillRect(0, 0, o * 2, o * 2);
 }
-/* cômodos: área fechada por paredes/portas (portas contam como parede, abertas ou não). Se há um jogador com lanterna ligada dentro,
-   o cômodo inteiro fica visível; área que chega à borda do mapa (aberta) não conta como cômodo */
-const MROOMV = .2;   // quanto da escuridão some dentro do cômodo (0 a 1)
-const MPASS = .18;   // quanto da luz atravessa uma passagem (0 a 1)
-function mRooms() {
-  const wl = mWl(), sig = wl.map(w => w.x1 + ',' + w.y1 + ',' + w.x2 + ',' + w.y2).join(';');
-  if (MZ.rm && MZ.rm.sig === sig) return MZ.rm;
-  const G = 6, W = Math.ceil(MC * MS / G) + 2, H = Math.ceil(MR * MS / G) + 2, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
-  const c = cv.getContext('2d'); c.lineCap = 'round'; c.strokeStyle = '#000'; c.lineWidth = 1.8; c.beginPath();
-  wl.forEach(w => { c.moveTo(w.x1 * MS / G + 1, w.y1 * MS / G + 1); c.lineTo(w.x2 * MS / G + 1, w.y2 * MS / G + 1); }); c.stroke();
-  const d = c.getImageData(0, 0, W, H).data, N = W * H, lab = new Int32Array(N), stk = new Int32Array(N), open = [false];
-  for (let i = 0; i < N; i++) if (d[i * 4 + 3] > 60) lab[i] = -1;
-  let n = 0;
-  for (let i0 = 0; i0 < N; i0++) {
-    if (lab[i0] !== 0) continue; n++; let sp = 0, op = false; stk[sp++] = i0; lab[i0] = n;
-    while (sp) {
-      const i = stk[--sp], x = i % W, y = (i / W) | 0; if (!x || !y || x === W - 1 || y === H - 1) op = true;
-      if (x > 0 && lab[i - 1] === 0) { lab[i - 1] = n; stk[sp++] = i - 1; }
-      if (x < W - 1 && lab[i + 1] === 0) { lab[i + 1] = n; stk[sp++] = i + 1; }
-      if (y > 0 && lab[i - W] === 0) { lab[i - W] = n; stk[sp++] = i - W; }
-      if (y < H - 1 && lab[i + W] === 0) { lab[i + W] = n; stk[sp++] = i + W; }
-    }
-    open[n] = op;
-  }
-  return (MZ.rm = { sig, G, W, H, lab, open, cv: {}, bb: {} });
-}
-function mRoomAt(rm, px, py) {   // cômodo fechado onde a luz está (0 = nenhum)
-  const cx = px / rm.G + 1, cy = py / rm.G + 1, gx = Math.floor(cx), gy = Math.floor(cy); let best = 0, bd = Infinity;
-  for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) {
-    const x = gx + dx, y = gy + dy; if (x < 0 || y < 0 || x >= rm.W || y >= rm.H) continue;
-    const l = rm.lab[y * rm.W + x]; if (l <= 0) continue; const dd = (x + .5 - cx) * (x + .5 - cx) + (y + .5 - cy) * (y + .5 - cy); if (dd < bd) { bd = dd; best = l; }
-  }
-  return best > 0 && !rm.open[best] ? best : 0;
-}
-function mRoomCv(rm, id) {
-  if (rm.cv[id]) return rm.cv[id];
-  const cv = document.createElement('canvas'); cv.width = rm.W; cv.height = rm.H; const c = cv.getContext('2d'), im = c.createImageData(rm.W, rm.H), px = im.data;
-  let bx0 = rm.W, by0 = rm.H, bx1 = -1, by1 = -1;
-  for (let i = 0; i < rm.lab.length; i++) if (rm.lab[i] === id) {
-    const k = i * 4, x = i % rm.W, y = (i / rm.W) | 0; px[k] = px[k + 1] = px[k + 2] = 255; px[k + 3] = 255;
-    if (x < bx0) bx0 = x; if (x > bx1) bx1 = x; if (y < by0) by0 = y; if (y > by1) by1 = y;
-  }
-  (rm.bb || (rm.bb = {}))[id] = [Math.max(0, bx0 - 2), Math.max(0, by0 - 2), Math.min(rm.W - 1, bx1 + 2), Math.min(rm.H - 1, by1 + 2)];   // só esta área precisa ser desenhada a cada quadro
-  c.putImageData(im, 0, 0); return (rm.cv[id] = cv);
-}
 const MJIT = [[0, 0], [6, 0], [-6, 0], [0, 6], [0, -6], [4, 4], [-4, 4], [4, -4], [-4, -4]];
 function mVisPolys(L, segList) {   // polígonos de visibilidade levemente deslocados (bordas macias)
   const out = [];
@@ -1564,14 +1518,13 @@ function mLightBuild() {
   const LO = e => e.dataset.lamp === '3' || !!(MZ.look && +e.dataset.tid === +MZ.look.tid);   // olhando pela janela: a lanterna do próprio boneco apaga (fica só a luz natural ao redor)
   const lamps0 = [...document.querySelectorAll('#mboard .mtk[data-lamp]')].filter(e => +e.dataset.lamp > 0 && !e.classList.contains('dead')).map(e => ({ x: e.offsetLeft + e.offsetWidth / 2, y: e.offsetTop + 19, R: Math.round((LO(e) ? MS * .95 : MS * 10.4 * (e.dataset.lamp === '2' ? .75 : 1)) * (1 - .45 * mFogD())), off: LO(e), dir: parseFloat(e.dataset.dir) || 0, Ra: Math.round(MS * 2.6 * (1 - .45 * mFogD())), Rc: Math.round(MS * .95 * (1 - .45 * mFogD())) }));
   const lkI = mLookInfo(), lamps = lkI ? lamps0.concat([{ x: lkI.x, y: lkI.y, R: Math.round(MS * 10.4 * (1 - .45 * mFogD())), off: false, dir: 0, Ra: Math.round(MS * 2.6 * (1 - .45 * mFogD())), Rc: 0, look: lkI }]) : lamps0;   // olhando: só a visão pela janela, sem as outras luzes
-  const wl0 = mWl(), q = w => [w.x1 * MS, w.y1 * MS, w.x2 * MS, w.y2 * MS], segs = wl0.filter(w => !(w.door && w.open && !w.rf) && !(w.win && !w.rf) && !w.pas).map(q), segsL = lkI ? wl0.filter(w => !(w.door && w.open && !w.rf) && !(w.win && !w.rf) && !w.pas && w.id !== lkI.w.id).map(q) : null, pas = wl0.filter(w => w.pas).map(q), old = MZ.lamps || []; MZ.segs = wl0.filter(w => !w.door && !w.win && !w.pas).map(q); MZ.wins = wl0.filter(w => w.win).map(q); MZ.pass = pas; MZ.drs = wl0.filter(w => w.door).map(w => ({ s: q(w), o: !!w.open && !w.rf }));
-  const rms = lamps.some(L => !L.off && !L.look) ? mRooms() : null;
-  const wsig = segs.join(';') + '|' + pas.join(';') + '|' + (segsL ? segsL.join(';') : '');
+  const wl0 = mWl(), q = w => [w.x1 * MS, w.y1 * MS, w.x2 * MS, w.y2 * MS], segs = wl0.filter(w => !(w.door && w.open && !w.rf) && !(w.win && !w.rf)).map(q), segsL = lkI ? wl0.filter(w => !(w.door && w.open && !w.rf) && !(w.win && !w.rf) && w.id !== lkI.w.id).map(q) : null, old = MZ.lamps || []; MZ.segs = wl0.filter(w => !w.door && !w.win).map(q); MZ.wins = wl0.filter(w => w.win).map(q); MZ.drs = wl0.filter(w => w.door).map(w => ({ s: q(w), o: !!w.open && !w.rf }));
+  const wsig = segs.join(';') + '|' + (segsL ? segsL.join(';') : '');
   MZ.lamps = lamps.map((L, i) => {
     const prv = old[i], key = [L.x, L.y, L.R, L.Ra, L.Rc, L.off ? 1 : 0, L.dir, L.look ? [L.look.w.id, L.look.a, L.look.b].join(',') : ''].join('|');
-    if (prv && prv.key === key && prv.wsig === wsig && prv.rms === rms) return prv;   // nada mudou para esta luz: não refaz
+    if (prv && prv.key === key && prv.wsig === wsig) return prv;   // nada mudou para esta luz: não refaz
     const sg = L.look ? segsL : segs;   // só a luz da visão atravessa a janela; as outras luzes continuam bloqueadas por ela
-    const polys = mVisPolys(L, sg);   // passagem não bloqueia nem enfraquece a lanterna: só separa a iluminação dos cômodos
+    const polys = mVisPolys(L, sg);
     const half = Math.min(L.R * 1.2, mVisExt(L, polys) + 48), size = Math.max(64, Math.ceil(half * 2 / 32) * 32), o = size / 2;   // buffers do tamanho da área iluminada (cômodo fechado = pequeno), não do raio inteiro da luz
     const m = mVisDraw(L, polys, size, o, 'vm');
     const dust = (old[i] && old[i].dust) || Array.from({ length: 14 }, () => ({ a: Math.random() * 6.283, d: .1 + Math.random() * .75, va: (Math.random() - .5) * .004, vd: (Math.random() - .5) * .002, r: .7 + Math.random() * 1.3, ph: Math.random() * 6.28 }));
@@ -1579,31 +1532,11 @@ function mLightBuild() {
     try { mk = mCv('k' + i, size); const bc = mk.getContext('2d'); bc.filter = 'blur(9px)'; bc.drawImage(m, 0, 0); } catch (e) { mk = m; }
     try { mCutBehind(mk.getContext('2d'), L, o, sg, 36); } catch (e) { }
     const ang = L.look ? mLookMask(size, o, L, 'a' + i) : L.off ? null : (prv && prv.ang && !prv.look && prv.dir === L.dir && prv.sz === size ? prv.ang : mConeMask(size, o, L.dir, 'a' + i));
-    const room = (() => { if (!rms || L.off || L.look) return null; const id = mRoomAt(rms, L.x, L.y); return id ? { id, cv: mRoomCv(rms, id), bb: rms.bb && rms.bb[id], G: rms.G, W: rms.W, H: rms.H } : null; })();
-    let spill = null;   // luz do cômodo vazando pela passagem para o cômodo vizinho, com fade logo à frente
-    if (room && pas.length) try {
-      const mA = mVisDraw(L, mVisPolys(L, sg.concat(pas)), size, o, 'sA'), mB = m;
-      const sp = mCv('sp', size), sc = sp.getContext('2d');
-      sc.drawImage(mB, 0, 0); sc.globalCompositeOperation = 'destination-out'; sc.drawImage(mA, 0, 0);   // só o que se vê através da passagem
-      const fd = mCv('fd', size), fc = fd.getContext('2d'), FD = MS * 2.8;
-      pas.forEach(q => {
-        const mx = (q[0] + q[2]) / 2 - L.x + o, my = (q[1] + q[3]) / 2 - L.y + o, sl = Math.hypot(q[2] - q[0], q[3] - q[1]) || 1;
-        let nx = -(q[3] - q[1]) / sl, ny = (q[2] - q[0]) / sl; if (nx * (mx - o) + ny * (my - o) < 0) { nx = -nx; ny = -ny; }
-        const g = fc.createLinearGradient(mx - nx * 3, my - ny * 3, mx + nx * FD, my + ny * FD), k = 3 / (3 + FD);
-        g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(k, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-        fc.fillStyle = g; fc.fillRect(0, 0, size, size);
-      });
-      sc.globalCompositeOperation = 'destination-in'; sc.drawImage(fd, 0, 0); sc.globalCompositeOperation = 'source-over';
-      const pb = mCv('p' + i, size), pc = pb.getContext('2d');
-      try { pc.filter = 'blur(7px)'; } catch (e) { }
-      pc.drawImage(sp, 0, 0); spill = pb;
-      try { mCutBehind(pc, L, o, sg, 36); } catch (e) { }
-    } catch (e) { spill = null; }
-    return { x: L.x, y: L.y, R: L.R, Ra: Math.min(L.R, L.Ra), mask: mk, o, dust, off: L.off, ang, dir: L.dir, sz: size, room, spill, Rc: L.Rc, look: !!L.look, key, wsig, rms };
+    return { x: L.x, y: L.y, R: L.R, Ra: Math.min(L.R, L.Ra), mask: mk, o, dust, off: L.off, ang, dir: L.dir, sz: size, Rc: L.Rc, look: !!L.look, key, wsig };
   });
   if (!(old.length === MZ.lamps.length && MZ.lamps.every((l, i) => l === old[i]))) MZ.lv = (MZ.lv || 0) + 1;   // alguma luz mudou: a parte estática precisa ser refeita
-  MZ.osig = JSON.stringify([MZ.segs, MZ.wins, MZ.pass, MZ.drs]);
-  { const P = MZ.pool; if (P) Object.keys(P).forEach(k => { const mm = /^[katp](\d+)$/.exec(k); if (mm && +mm[1] >= lamps.length) { P[k].width = P[k].height = 0; delete P[k]; } }); }   // libera os canvases de luzes que sumiram
+  MZ.osig = JSON.stringify([MZ.segs, MZ.wins, MZ.drs]);
+  { const P = MZ.pool; if (P) Object.keys(P).forEach(k => { const mm = /^[kat](\d+)$/.exec(k); if (mm && +mm[1] >= lamps.length) { P[k].width = P[k].height = 0; delete P[k]; } }); }   // libera os canvases de luzes que sumiram
 }
 /* círculo ao redor do boneco com a lanterna ligada: idêntico ao da lanterna desligada */
 function mCircDark(x, o, R) {
@@ -1623,7 +1556,7 @@ function mLightDraw(t) {
   const CW = cv.width, CH = cv.height;
   c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1;
   if (!L.length) { c.clearRect(0, 0, CW, CH); MZ.bk = null; return true; }
-  /* parte estática (escuridão + luz do cômodo + vazamento da passagem): montada uma vez e reaproveitada, só refeita quando as luzes mudam */
+  /* parte estática (escuridão): montada uma vez e reaproveitada, só refeita quando as luzes mudam */
   const dk = mDarkA(), bkey = CW + 'x' + CH + '|' + dk + '|' + (MZ.lv || 0);
   let full = !MZ.loop || !!MZ.full;
   if (!MZ.bk || MZ.bk.key !== bkey) {
@@ -1631,12 +1564,6 @@ function mLightDraw(t) {
     if (bcv.width !== CW || bcv.height !== CH) { bcv.width = CW; bcv.height = CH; }
     const bc = bcv.getContext('2d'); bc.setTransform(1, 0, 0, 1, 0, 0); bc.globalCompositeOperation = 'source-over'; bc.globalAlpha = 1; bc.clearRect(0, 0, CW, CH);
     bc.fillStyle = `rgba(1,3,4,${dk})`; bc.fillRect(0, 0, CW, CH);
-    { const seen = new Set(); bc.globalCompositeOperation = 'destination-out'; bc.globalAlpha = MROOMV;   // cômodo fechado com jogador dentro: fica visível
-      L.forEach(l => { const r = l.room; if (!r || seen.has(r.cv)) return; seen.add(r.cv); const b = r.bb;
-        if (b) bc.drawImage(r.cv, b[0], b[1], b[2] - b[0] + 1, b[3] - b[1] + 1, (b[0] - 1) * r.G, (b[1] - 1) * r.G, (b[2] - b[0] + 1) * r.G, (b[3] - b[1] + 1) * r.G);   // só a área do cômodo, não o mapa inteiro
-        else bc.drawImage(r.cv, -r.G, -r.G, r.W * r.G, r.H * r.G); });
-      L.forEach(l => { if (l.spill) bc.drawImage(l.spill, l.x - l.o, l.y - l.o); });   // vazamento pela passagem (com fade)
-      bc.globalAlpha = 1; bc.globalCompositeOperation = 'source-over'; }
     MZ.bk = { key: bkey, cv: bcv }; full = true;
   }
   { const os = (MZ.osig || '') + '|' + (S.mesa.wlock ? 1 : 0); if (os !== MZ.osd) { MZ.osd = os; full = true; } }   // paredes/portas/janelas mudaram: redesenha tudo
@@ -1694,13 +1621,6 @@ function mLightDraw(t) {
     c.beginPath(); wn.forEach(q => { c.moveTo(q[0], q[1]); c.lineTo(q[2], q[3]); });
     c.setLineDash([]); c.strokeStyle = 'rgba(0,0,0,.85)'; c.lineWidth = 6; c.stroke();
     c.strokeStyle = 'rgba(143,211,238,.9)'; c.lineWidth = 2.5; c.stroke();
-  }
-  const ps = MZ.pass || [];
-  if (ps.length && !S.mesa.wlock) {
-    c.globalCompositeOperation = 'source-over'; c.lineCap = 'round';
-    c.beginPath(); ps.forEach(q => { c.moveTo(q[0], q[1]); c.lineTo(q[2], q[3]); });
-    c.setLineDash([]); c.strokeStyle = 'rgba(0,0,0,.85)'; c.lineWidth = 6; c.stroke();
-    c.setLineDash([2, 6]); c.strokeStyle = 'rgba(201,160,255,.95)'; c.lineWidth = 3; c.stroke(); c.setLineDash([]);
   }
   const dr = MZ.drs || [];
   if (dr.length && !S.mesa.wlock) {
@@ -2272,7 +2192,7 @@ function combatFx(o) {
     }
   } catch (e) { }
 }
-const MAP_EDIT = /^(mundo|mwadd|mdadd|mwinadd|mpasadd|mwdel|mwlock|mlock|mgrid|mimgdel|mimgdec|mimginc|mimgfit|mcexp|mccopy|mcimp|mcfile|mcopen|mcnew|mclear)$/;
+const MAP_EDIT = /^(mundo|mwadd|mdadd|mwinadd|mwdel|mwlock|mlock|mgrid|mimgdel|mimgdec|mimginc|mimgfit|mcexp|mccopy|mcimp|mcfile|mcopen|mcnew|mclear)$/;
 const MESTRE_ONLY = /^(mfl|zero|tcost|fstun|rodada|addf|haddmap|hadd|happly|hon|hoff|hdel|afnew|afsel|afdel)$/;
 function act(a, d, el) {
   if (!ME.mestre && MAP_EDIT.test(a)) return msg('Só o mestre edita o mapa');
@@ -2363,12 +2283,6 @@ function act(a, d, el) {
       const len = MS * .75, id = (S.mesa.wn = (S.mesa.wn || 0) + 1);
       const cx = Math.max(len, Math.min(MC * MS - len, mVc()[0])), cy = Math.max(8, Math.min(MR * MS - 8, mVc()[1]));
       mWl().push({ id, x1: (cx - len) / MS, y1: cy / MS, x2: (cx + len) / MS, y2: cy / MS, win: 1 }); S.mesa.wsel = id; S.mesa.sel = 0; break;
-    }
-    case 'mpasadd': {
-      if (S.mesa.wlock) break;
-      const len = MS * .75, id = (S.mesa.wn = (S.mesa.wn || 0) + 1);
-      const cx = Math.max(len, Math.min(MC * MS - len, mVc()[0])), cy = Math.max(8, Math.min(MR * MS - 8, mVc()[1]));
-      mWl().push({ id, x1: (cx - len) / MS, y1: cy / MS, x2: (cx + len) / MS, y2: cy / MS, pas: 1 }); S.mesa.wsel = id; S.mesa.sel = 0; break;
     }
     case 'mdtog': { const w = mWl().find(x => x.id === +d.id); if (w && w.door) { if (w.rf) msg('Porta reforçada: trancada'); else w.open = w.open ? 0 : 1; } break; }
     case 'mdes': { const c = MOV[d.c]; if (c) { const a = invAdd('t', c[0]), b = invAdd('p', c[1]), lost = c[0] - a + (c[1] - b); wlog(`Móvel ${d.c.toLowerCase()} desmontado: +${a} tábuas, +${b} pregos` + (lost ? ` — inventário cheio, ficaram no chão ${c[0] - a} tábuas e ${c[1] - b} pregos` : '')); } break; }
@@ -2816,7 +2730,7 @@ function mNear(x, y, ig) {
 function mPut(id, x, y, exact) { id = +id; const c = exact ? [Math.round(Math.max(0, Math.min(MC - 1, x)) * 100) / 100, Math.round(Math.max(0, Math.min(MR - 1, y)) * 100) / 100] : mNear(x, y, id); let t = mtk(id); if (!t) { t = { id, x: 0, y: 0 }; S.mesa.tk.push(t); } t.x = c[0]; t.y = c[1]; }
 /* ---- física: paredes e portas fechadas bloqueiam os bonecos ---- */
 const TKR = .28;   // raio do boneco, em casas
-const mBlk = () => mWl().filter(w => !(w.door && w.open && !w.rf) && !w.pas);
+const mBlk = () => mWl().filter(w => !(w.door && w.open && !w.rf));
 function mSegX(ax, ay, bx, by, cx, cy, dx, dy) {
   const o = (px, py, qx, qy, rx, ry) => (qx - px) * (ry - py) - (qy - py) * (rx - px);
   return o(ax, ay, bx, by, cx, cy) * o(ax, ay, bx, by, dx, dy) < 0 && o(cx, cy, dx, dy, ax, ay) * o(cx, cy, dx, dy, bx, by) < 0;
@@ -2969,12 +2883,12 @@ function vMesa() {
   mEnsure();
   const pf = mainP(), sel = mtk(S.mesa.sel), npcs = S.fs.filter(f => f.side === 'E');
   const lk = !!S.mesa.lock, dis = lk ? ' disabled' : '', im = MZ.img && S.mesa.im, kz0 = mK(), lt = mLantTk(), lo = !!(lt && lt.loff);
-  let h = `<div class="mbar${MZ.opt ? ' open' : ''}"><div class="mrow"><button data-act="mopt"${MZ.opt ? ' class="go"' : ''}>☰ Opções</button>${ME.mestre ? '<button class="go" data-act="mmenu">+ Adicionar adversário</button><button class="go" data-act="mhmenu">+ Horda</button><button data-act="ctnew">+ Recipiente</button>' : ''}` + (pf && !mtk(pf.id) ? `<button data-act="mpick" data-id="${pf.id}">+ Meu boneco</button>` : '') + `<button data-act="mref"${MZ.ref ? ' class="go"' : ''}>Reforço</button>${MZ.look ? '<button class="go" data-act="mlookx">Parar de olhar</button>' : ''}<button data-act="mlant"${lo ? '' : ' class="go"'} aria-pressed="${!lo}"${lt ? ` title="${esc(mf(lt).name)}"` : ' disabled'}>Lanterna: ${lo ? 'desligada' : 'ligada'}</button>${ME.mestre ? `<button data-act="mgrid"${MZ.gridOff ? '' : ' class="go"'} aria-pressed="${!MZ.gridOff}">Grade: ${MZ.gridOff ? 'desligada' : 'ligada'}</button><button data-act="mwadd"${S.mesa.wlock ? ' disabled' : ''}>+ Parede</button><button data-act="mdadd"${S.mesa.wlock ? ' disabled' : ''}>+ Porta</button><button data-act="mwinadd"${S.mesa.wlock ? ' disabled' : ''} title="Janela: a luz passa, mas não revela o cômodo">+ Janela</button><button data-act="mpasadd"${S.mesa.wlock ? ' disabled' : ''} title="Passagem: a lanterna e a luz do cômodo passam (com fade) e os bonecos atravessam">+ Passagem</button>` : ''}<button data-act="mimgpick"${dis}>Importar imagem do mapa</button>` + (MZ.img && ME.mestre ? `<button data-act="mimgdel"${dis}>Remover imagem</button>` : '') + '<input type="file" id="mimg" accept="image/*" hidden><input type="file" id="mtkimg" accept="image/png,image/*" hidden></div>';
+  let h = `<div class="mbar${MZ.opt ? ' open' : ''}"><div class="mrow"><button data-act="mopt"${MZ.opt ? ' class="go"' : ''}>☰ Opções</button>${ME.mestre ? '<button class="go" data-act="mmenu">+ Adicionar adversário</button><button class="go" data-act="mhmenu">+ Horda</button><button data-act="ctnew">+ Recipiente</button>' : ''}` + (pf && !mtk(pf.id) ? `<button data-act="mpick" data-id="${pf.id}">+ Meu boneco</button>` : '') + `<button data-act="mref"${MZ.ref ? ' class="go"' : ''}>Reforço</button>${MZ.look ? '<button class="go" data-act="mlookx">Parar de olhar</button>' : ''}<button data-act="mlant"${lo ? '' : ' class="go"'} aria-pressed="${!lo}"${lt ? ` title="${esc(mf(lt).name)}"` : ' disabled'}>Lanterna: ${lo ? 'desligada' : 'ligada'}</button>${ME.mestre ? `<button data-act="mgrid"${MZ.gridOff ? '' : ' class="go"'} aria-pressed="${!MZ.gridOff}">Grade: ${MZ.gridOff ? 'desligada' : 'ligada'}</button><button data-act="mwadd"${S.mesa.wlock ? ' disabled' : ''}>+ Parede</button><button data-act="mdadd"${S.mesa.wlock ? ' disabled' : ''}>+ Porta</button><button data-act="mwinadd"${S.mesa.wlock ? ' disabled' : ''} title="Janela: a luz passa, mas não revela o cômodo">+ Janela</button>` : ''}<button data-act="mimgpick"${dis}>Importar imagem do mapa</button>` + (MZ.img && ME.mestre ? `<button data-act="mimgdel"${dis}>Remover imagem</button>` : '') + '<input type="file" id="mimg" accept="image/*" hidden><input type="file" id="mtkimg" accept="image/png,image/*" hidden></div>';
   if (ME.mestre) h += `<div class="mrow"><button data-act="mlock"${lk ? ' class="go"' : ''}>${lk ? 'Desbloquear' : 'Bloquear'} movimento do mapa</button><button data-act="mwlock"${S.mesa.wlock ? ' class="go"' : ''}>${S.mesa.wlock ? 'Desbloquear' : 'Bloquear'} paredes</button><button data-act="mundo"${(MZ.undo || []).length ? '' : ' disabled'} title="Desfazer a última ação do mapa (Ctrl+Z)">↶ Desfazer</button>` + (im ? `<button data-act="mimgdec" title="Diminuir 1%" aria-label="Diminuir imagem em 1%"${dis}>−</button><label class="mscl">Tamanho da imagem <b id="mpct">${mPct(im)}%</b><input type="range" id="mscale" min="20" max="400" step="1" value="${mPct(im)}"${dis}></label><button data-act="mimginc" title="Aumentar 1%" aria-label="Aumentar imagem em 1%"${dis}>+</button><button data-act="mimgfit"${dis}>Ajustar ao mapa</button>` : '') + '</div>';
   if (ME.mestre) h += `<div class="mrow"><label class="mscl">Escuridão <b id="mdv">${Math.round(mDarkA() * 100)}%</b><input type="range" id="mdark" min="0" max="100" step="1" value="${Math.round(mDarkA() * 100)}"></label><label class="mscl">Neblina <b id="mfv">${Math.round(mFogD() * 100)}%</b><input type="range" id="mfogr" min="0" max="100" step="1" value="${Math.round(mFogD() * 100)}"></label></div>`;
   if (ME.mestre) h += `<div class="mrow mzoom mfl"><span>Andar:</span><button data-act="mfl" data-d="-1"${FL.busy ? ' disabled' : ''}>▼ Descer</button><b>${flName(S.mesa.fl || 0)}</b><button data-act="mfl" data-d="1"${FL.busy ? ' disabled' : ''}>▲ Subir</button></div>`;
   h += `<div class="mrow mzoom">${ME.mestre ? '' : `<span class="tg y">${flName(S.mesa.fl || 0)}</span>`}<span>Visão:</span><button data-act="mvfit"${MZ.vz ? '' : ' class="go"'} title="Mostra o mapa inteiro na tela">Ajustar à tela</button><button data-act="mvz" data-d="-1" aria-label="Afastar a visão">−</button><b>${Math.round(kz0 * 100)}%</b><button data-act="mvz" data-d="1" aria-label="Aproximar a visão">+</button><button data-act="mvz100">100%</button></div>`;
-  h += MZ.place ? `<p class="res">Toque numa casa do mapa para posicionar <b>${esc(fig(MZ.place).name)}</b>. <button class="lnk" data-act="mcancel">Cancelar</button></p>` : '<details class="mhelp"><summary>Ajuda <span class="tg g">boneco</span> <span class="tg y">NPC</span> <span class="tg r">zumbi</span></summary><p class="hint">Arraste os tokens para mover. Paredes: arraste a linha ou as bolinhas das pontas; com dois dedos você gira e estica. Portas: toque para abrir ou fechar (fechada bloqueia a luz); com as paredes desbloqueadas, a porta também pode ser movida. Janelas: a luz passa por elas, mas elas não abrem o cômodo (a casa continua fechada) e continuam bloqueando os bonecos. Passagens: a lanterna atravessa normalmente; a luz do cômodo também vaza para o vizinho, com um fade logo à frente. Os bonecos atravessam. Lanterna: liga e desliga a luz do boneco. Toque num adversário e escolha “Combater”.' + (im ? (lk ? ' A imagem está bloqueada.' : ' Arraste uma área vazia do mapa para mover a imagem.') : '') + '</p></details>';
+  h += MZ.place ? `<p class="res">Toque numa casa do mapa para posicionar <b>${esc(fig(MZ.place).name)}</b>. <button class="lnk" data-act="mcancel">Cancelar</button></p>` : '<details class="mhelp"><summary>Ajuda <span class="tg g">boneco</span> <span class="tg y">NPC</span> <span class="tg r">zumbi</span></summary><p class="hint">Arraste os tokens para mover. Paredes: arraste a linha ou as bolinhas das pontas; com dois dedos você gira e estica. Portas: toque para abrir ou fechar (fechada bloqueia a luz); com as paredes desbloqueadas, a porta também pode ser movida. Janelas: a luz passa por elas, mas elas não abrem o cômodo (a casa continua fechada) e continuam bloqueando os bonecos. Lanterna: liga e desliga a luz do boneco. Toque num adversário e escolha “Combater”.' + (im ? (lk ? ' A imagem está bloqueada.' : ' Arraste uma área vazia do mapa para mover a imagem.') : '') + '</p></details>';
   if (MZ.cplace) h += '<p class="res">Toque no mapa no ponto exato do recipiente (posição livre, sem grade). Depois é só arrastar para ajustar. <button class="lnk" data-act="ctcancel">Cancelar</button></p>';
   h += '</div>';
   const kz = kz0;
@@ -3039,7 +2953,7 @@ function mapExport(withImg) {
     if (f.hp <= 0) return;
     n.push({ n: f.name, k: f.kind === 'zumbi' ? 'z' : 'h', x: t.x, y: t.y, f: { w: f.weapon, l: f.lvl, fo: f.fo || 0, ag: f.agi || 0, hp: Math.round(f.hp * 10) / 10, a: f.arm, e: f.esc || 0, m: f.mord || 0 } });
   });
-  const w = mWl().map(q => { const r = { x1: mk4(q.x1), y1: mk4(q.y1), x2: mk4(q.x2), y2: mk4(q.y2) }; if (q.door) { r.d = 1; r.o = q.open && !q.rf ? 1 : 0; } else if (q.win) r.j = 1; else if (q.pas) r.p = 1; if (q.rf) { r.f = 1; r.s = q.rs || 0; } if (q.win && q.br) r.b = q.br; return r; });
+  const w = mWl().map(q => { const r = { x1: mk4(q.x1), y1: mk4(q.y1), x2: mk4(q.x2), y2: mk4(q.y2) }; if (q.door) { r.d = 1; r.o = q.open && !q.rf ? 1 : 0; } else if (q.win) r.j = 1; if (q.rf) { r.f = 1; r.s = q.rs || 0; } if (q.win && q.br) r.b = q.br; return r; });
   if (!n.length && !p.length && !w.length && !im) return '';
   const o = { v: 2, g: [MC, MR], im: im ? { x: mk4(im.x / bw), y: mk4(im.y / bh), w: mk4(im.w / bw), ar: mk4(im.ar) } : null, n, p, w, l: S.mesa.tk.some(t => t.id > 0 && !t.loff) ? 1 : 0 };
   if (withImg && im) o.img = MZ.img;
@@ -3059,7 +2973,7 @@ function mapParse(txt) {
     img,
     n: o.n.slice(0, 80).map(x => ({ name: String(x.n || 'NPC').slice(0, 30), kind: x.k === 'z' ? 'zumbi' : 'humano', x: c(x.x, MC - 1), y: c(x.y, MR - 1), f: mCleanNpc(x.f) })),
     p: v === 2 && Array.isArray(o.p) ? o.p.slice(0, 40).map(x => ({ name: String(x.n || '').slice(0, 30), x: c(x.x, MC - 1), y: c(x.y, MR - 1) })) : null,
-    w: v === 2 && Array.isArray(o.w) ? o.w.slice(0, 500).filter(x => x && [x.x1, x.y1, x.x2, x.y2].every(k => isFinite(+k))).map(x => ({ x1: g(x.x1, MC), y1: g(x.y1, MR), x2: g(x.x2, MC), y2: g(x.y2, MR), door: x.d ? 1 : 0, open: x.d && x.o ? 1 : 0, win: !x.d && x.j ? 1 : 0, pas: !x.d && x.p ? 1 : 0, rf: x.f ? 1 : 0, rs: x.f ? Math.max(0, +x.s || 0) : 0, br: !x.d && x.j ? Math.max(0, Math.min(2, +x.b || 0)) : 0 })) : null,
+    w: v === 2 && Array.isArray(o.w) ? o.w.slice(0, 500).filter(x => x && [x.x1, x.y1, x.x2, x.y2].every(k => isFinite(+k))).map(x => ({ x1: g(x.x1, MC), y1: g(x.y1, MR), x2: g(x.x2, MC), y2: g(x.y2, MR), door: x.d ? 1 : 0, open: x.d && x.o ? 1 : 0, win: !x.d && x.j ? 1 : 0, rf: x.f ? 1 : 0, rs: x.f ? Math.max(0, +x.s || 0) : 0, br: !x.d && x.j ? Math.max(0, Math.min(2, +x.b || 0)) : 0 })) : null,
     lant: v === 2 ? (o.l ? 1 : 0) : null
   };
 }
@@ -3070,7 +2984,7 @@ function mapApply(o) {
   if (o.p) o.p.forEach(x => { const f = S.fs.find(q => q.side === 'P' && q.name === x.name); if (f) { mPut(f.id, x.x, x.y); np++; } });
   o.n.forEach(x => { const id = S.mesa.sn++; S.mesa.st.push({ id, name: x.name, kind: x.kind, f: x.f }); mPut(-id, x.x, x.y); });
   if (o.w) {
-    S.mesa.walls = o.w.map((x, k) => { const r = { id: k + 1, x1: x.x1, y1: x.y1, x2: x.x2, y2: x.y2 }; if (x.door) { r.door = 1; r.open = x.open ? 1 : 0; } else if (x.win) r.win = 1; else if (x.pas) r.pas = 1; if (x.rf) { r.rf = 1; r.rs = x.rs; } if (x.br) r.br = x.br; return r; });
+    S.mesa.walls = o.w.map((x, k) => { const r = { id: k + 1, x1: x.x1, y1: x.y1, x2: x.x2, y2: x.y2 }; if (x.door) { r.door = 1; r.open = x.open ? 1 : 0; } else if (x.win) r.win = 1; if (x.rf) { r.rf = 1; r.rs = x.rs; } if (x.br) r.br = x.br; return r; });
     S.mesa.wn = o.w.length; S.mesa.wsel = 0;
   }
   if (o.lant !== null) S.mesa.tk.forEach(t => { if (t.id > 0) t.loff = o.lant ? 0 : 1; });
